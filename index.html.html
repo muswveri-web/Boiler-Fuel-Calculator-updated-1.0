@@ -1,0 +1,758 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boiler Fuel Calculator (Accurate Steam Table)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eaeaea;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .input-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .common-inputs, .fuel-inputs {
+            flex: 1;
+            min-width: 300px;
+            background-color: #f9f9f9;
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid #eaeaea;
+        }
+        
+        .fuel-inputs-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            flex: 2;
+        }
+        
+        .fuel-input {
+            flex: 1;
+            min-width: 300px;
+            background-color: #f9f9f9;
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid #eaeaea;
+        }
+        
+        h2 {
+            color: #3498db;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .fuel-icon {
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .unit {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-left: 5px;
+        }
+        
+        .btn-container {
+            text-align: center;
+            margin: 30px 0;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: 600;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .calculate-btn {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .calculate-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .refresh-btn {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .refresh-btn:hover {
+            background-color: #27ae60;
+        }
+        
+        .results-section {
+            margin-top: 40px;
+            display: none;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .comparison-table th {
+            background-color: #2c3e50;
+            color: white;
+            text-align: left;
+            padding: 15px;
+        }
+        
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .comparison-table tr:hover {
+            background-color: #f1f1f1;
+        }
+        
+        .highlight {
+            font-weight: bold;
+            color: #27ae60;
+        }
+        
+        .warning {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        
+        .recommendation {
+            background-color: #e8f4fc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border-left: 5px solid #3498db;
+        }
+        
+        .result-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .fuel-title {
+            display: flex;
+            align-items: center;
+        }
+        
+        .biomass-color {
+            color: #27ae60;
+        }
+        
+        .coal-color {
+            color: #34495e;
+        }
+        
+        @media (max-width: 768px) {
+            .input-section {
+                flex-direction: column;
+            }
+            
+            .fuel-inputs-container {
+                flex-direction: column;
+            }
+            
+            .comparison-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .btn-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            button {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+        
+        .calculation-steps {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            font-size: 0.9rem;
+        }
+        
+        .step {
+            margin-bottom: 15px;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            background-color: #fadbd8;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .steam-table-note {
+            background-color: #e8f6f3;
+            padding: 12px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #1a5276;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .bottom-refresh {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #eee;
+        }
+        
+        .bottom-refresh button {
+            padding: 12px 30px;
+            font-size: 16px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-fire"></i> Boiler Fuel Calculator</h1>
+            <p class="subtitle">Compare fuel consumption and costs for biomass and coal in steam generation by Muswver Ijaz Khan</p>
+            <div class="steam-table-note">
+                <i class="fas fa-check-circle"></i> <strong>Updated:</strong> Now includes accurate steam table data for pressures from 1 to 30 bar + Refresh Button
+            </div>
+        </header>
+        
+        <div class="input-section">
+            <div class="common-inputs">
+                <h2><i class="fas fa-cogs"></i> Boiler Parameters</h2>
+                
+                <div class="input-group">
+                    <label for="steam-generation">Steam Generation Rate <span class="unit">(tph)</span></label>
+                    <input type="number" id="steam-generation" value="10" step="0.1" min="1">
+                </div>
+                
+                <div class="input-group">
+                    <label for="steam-pressure">Steam Pressure <span class="unit">(bar)</span></label>
+                    <input type="number" id="steam-pressure" value="12" step="0.1" min="1">
+                </div>
+                
+                <div class="input-group">
+                    <label for="feedwater-temp">Feed Water Temperature <span class="unit">(°C)</span></label>
+                    <input type="number" id="feedwater-temp" value="80" step="1" min="10">
+                </div>
+            </div>
+            
+            <div class="fuel-inputs-container">
+                <div class="fuel-input">
+                    <div class="fuel-title">
+                        <h3 class="biomass-color"><i class="fas fa-leaf fuel-icon"></i> Biomass (Corn Cob)</h3>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="biomass-gcv">Gross Calorific Value <span class="unit">(kcal/kg)</span></label>
+                        <input type="number" id="biomass-gcv" value="4000" step="100" min="1000">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="biomass-efficiency">Boiler Efficiency <span class="unit">(%)</span></label>
+                        <input type="number" id="biomass-efficiency" value="75" step="1" min="1" max="100">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="biomass-rate">Fuel Rate <span class="unit">(PKR/kg)</span></label>
+                        <input type="number" id="biomass-rate" value="30" step="0.1" min="0">
+                    </div>
+                </div>
+                
+                <div class="fuel-input">
+                    <div class="fuel-title">
+                        <h3 class="coal-color"><i class="fas fa-mountain fuel-icon"></i> Coal</h3>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="coal-gcv">Gross Calorific Value <span class="unit">(kcal/kg)</span></label>
+                        <input type="number" id="coal-gcv" value="5800" step="100" min="1000">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="coal-efficiency">Boiler Efficiency <span class="unit">(%)</span></label>
+                        <input type="number" id="coal-efficiency" value="80" step="1" min="1" max="100">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="coal-rate">Fuel Rate <span class="unit">(PKR/kg)</span></label>
+                        <input type="number" id="coal-rate" value="50" step="0.1" min="0">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="btn-container">
+            <button id="calculate-btn" type="button" class="calculate-btn">
+                <i class="fas fa-calculator"></i> Calculate & Compare Fuels
+            </button>
+            <button id="refresh-btn-top" type="button" class="refresh-btn" onclick="window.location.reload()">
+                <i class="fas fa-redo"></i> Reset All Values
+            </button>
+            <div id="error-message" class="error-message"></div>
+        </div>
+        
+        <div class="results-section" id="results-section">
+            <h2><i class="fas fa-chart-bar"></i> Comparison Results</h2>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Criteria</th>
+                        <th>Biomass (Corn Cob)</th>
+                        <th>Coal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>GCV (kcal/kg)</td>
+                        <td id="biomass-gcv-result" class="result-value">-</td>
+                        <td id="coal-gcv-result" class="result-value">-</td>
+                    </tr>
+                    <tr>
+                        <td>Boiler Efficiency (%)</td>
+                        <td id="biomass-eff-result" class="result-value">-</td>
+                        <td id="coal-eff-result" class="result-value">-</td>
+                    </tr>
+                    <tr>
+                        <td>Heat Required per kg Steam (kcal)</td>
+                        <td id="heat-per-steam" colspan="2" class="result-value" style="text-align:center;">-</td>
+                    </tr>
+                    <tr>
+                        <td>Fuel per kg Steam (kg)</td>
+                        <td id="biomass-per-kg" class="result-value">-</td>
+                        <td id="coal-per-kg" class="result-value">-</td>
+                    </tr>
+                    <tr>
+                        <td>Fuel Consumption per Hour (kg/h)</td>
+                        <td id="biomass-per-hour" class="result-value">-</td>
+                        <td id="coal-per-hour" class="result-value">-</td>
+                    </tr>
+                    <tr>
+                        <td>Fuel Cost (PKR/kg)</td>
+                        <td id="biomass-rate-result" class="result-value">-</td>
+                        <td id="coal-rate-result" class="result-value">-</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fuel Cost per kg Steam (PKR)</strong></td>
+                        <td id="biomass-cost-per-steam" class="result-value highlight">-</td>
+                        <td id="coal-cost-per-steam" class="result-value highlight">-</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="recommendation" id="recommendation">
+                <h3><i class="fas fa-lightbulb"></i> Recommendation</h3>
+                <p id="recommendation-text">-</p>
+            </div>
+            
+            <div class="calculation-steps">
+                <h3><i class="fas fa-list-ol"></i> Calculation Steps</h3>
+                <div class="step">
+                    <div class="step-title">Step 1: Calculate heat required per kg of steam</div>
+                    <p id="step1">-</p>
+                </div>
+                <div class="step">
+                    <div class="step-title">Step 2: Calculate total heat to steam per hour</div>
+                    <p id="step2">-</p>
+                </div>
+                <div class="step">
+                    <div class="step-title">Step 3: Calculate fuel consumption for each fuel</div>
+                    <p id="step3">-</p>
+                </div>
+                <div class="step">
+                    <div class="step-title">Step 4: Calculate fuel cost per kg of steam</div>
+                    <p id="step4">-</p>
+                </div>
+            </div>
+            
+            <!-- Bottom Refresh Button -->
+            <div class="bottom-refresh">
+                <button type="button" class="refresh-btn" onclick="window.location.reload()">
+                    <i class="fas fa-redo"></i> Reset Calculator & Start New Calculation
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Move variables to global scope
+        let resultsSection;
+        let errorMessageElement;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const calculateBtn = document.getElementById('calculate-btn');
+            resultsSection = document.getElementById('results-section');
+            errorMessageElement = document.getElementById('error-message');
+            
+            // Set default values
+            setDefaultValues();
+            
+            calculateBtn.addEventListener('click', function() {
+                calculateAndDisplayResults();
+            });
+            
+            // Calculate on Enter key in any input field
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('keyup', function(event) {
+                    if (event.key === 'Enter') {
+                        calculateAndDisplayResults();
+                    }
+                });
+            });
+            
+            // Clear error message when user starts typing
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    errorMessageElement.style.display = 'none';
+                    errorMessageElement.textContent = '';
+                });
+            });
+        });
+        
+        function setDefaultValues() {
+            // Set default values from the problem statement
+            document.getElementById('steam-generation').value = 10;
+            document.getElementById('steam-pressure').value = 12;
+            document.getElementById('feedwater-temp').value = 80;
+            
+            document.getElementById('biomass-gcv').value = 4000;
+            document.getElementById('biomass-efficiency').value = 75;
+            document.getElementById('biomass-rate').value = 30;
+            
+            document.getElementById('coal-gcv').value = 5800;
+            document.getElementById('coal-efficiency').value = 80;
+            document.getElementById('coal-rate').value = 50;
+        }
+        
+        // ================================================
+        // ACCURATE STEAM TABLE FUNCTION (Updated Version)
+        // ================================================
+        function getSteamEnthalpy(pressure) {
+            // Comprehensive steam table data (Pressure in bar, Enthalpy of Saturated Steam in kcal/kg)
+            // Data compiled from standard IAPWS-IF97 steam tables (Engineering Toolbox/NIST references)
+            const steamTableData = [
+                { p: 1.0, h: 639.0 },  { p: 1.5, h: 643.3 },  { p: 2.0, h: 646.4 },
+                { p: 2.5, h: 648.9 },  { p: 3.0, h: 650.8 },  { p: 3.5, h: 652.5 },
+                { p: 4.0, h: 653.9 },  { p: 4.5, h: 655.2 },  { p: 5.0, h: 656.2 },
+                { p: 6.0, h: 658.1 },  { p: 7.0, h: 659.7 },  { p: 8.0, h: 661.1 },
+                { p: 9.0, h: 662.3 },  { p: 10.0, h: 663.4 }, { p: 11.0, h: 664.4 },
+                { p: 12.0, h: 665.3 }, { p: 13.0, h: 666.1 }, { p: 14.0, h: 666.9 },
+                { p: 15.0, h: 667.5 }, { p: 16.0, h: 668.1 }, { p: 17.0, h: 668.7 },
+                { p: 18.0, h: 669.2 }, { p: 19.0, h: 669.7 }, { p: 20.0, h: 670.1 },
+                { p: 25.0, h: 671.8 }, { p: 30.0, h: 673.0 }
+            ];
+
+            // Validate input
+            if (pressure <= 0 || pressure > 30) {
+                // Provide a safe default and log a warning
+                console.warn(`Pressure (${pressure} bar) is outside the reliable range (1-30 bar). Using approximation.`);
+                // Simple fallback approximation for unexpected values
+                return 640 + 1.1 * pressure;
+            }
+
+            // 1. Check for exact match in the table
+            const exactMatch = steamTableData.find(item => item.p === pressure);
+            if (exactMatch) {
+                return exactMatch.h;
+            }
+
+            // 2. Find the bounding data points for interpolation
+            let lowerIndex = 0;
+            let upperIndex = steamTableData.length - 1;
+
+            for (let i = 0; i < steamTableData.length - 1; i++) {
+                if (pressure > steamTableData[i].p && pressure < steamTableData[i + 1].p) {
+                    lowerIndex = i;
+                    upperIndex = i + 1;
+                    break;
+                }
+            }
+
+            const lower = steamTableData[lowerIndex];
+            const upper = steamTableData[upperIndex];
+
+            // 3. Perform linear interpolation
+            // Formula: h = h_lower + (pressure - p_lower) * (h_upper - h_lower) / (p_upper - p_lower)
+            const enthalpy = lower.h + (pressure - lower.p) * (upper.h - lower.h) / (upper.p - lower.p);
+
+            // Return value rounded to 1 decimal place (kcal/kg precision)
+            return Math.round(enthalpy * 10) / 10;
+        }
+        // ================================================
+        // END OF STEAM TABLE FUNCTION
+        // ================================================
+        
+        function calculateAndDisplayResults() {
+            // Reset error message
+            if (errorMessageElement) {
+                errorMessageElement.style.display = 'none';
+                errorMessageElement.textContent = '';
+            }
+            
+            try {
+                // Get common inputs
+                const steamGeneration = parseFloat(document.getElementById('steam-generation').value); // tph
+                const steamPressure = parseFloat(document.getElementById('steam-pressure').value); // bar
+                const feedwaterTemp = parseFloat(document.getElementById('feedwater-temp').value); // °C
+                
+                // Get biomass inputs
+                const biomassGCV = parseFloat(document.getElementById('biomass-gcv').value); // kcal/kg
+                const biomassEfficiency = parseFloat(document.getElementById('biomass-efficiency').value); // %
+                const biomassRate = parseFloat(document.getElementById('biomass-rate').value); // PKR/kg
+                
+                // Get coal inputs
+                const coalGCV = parseFloat(document.getElementById('coal-gcv').value); // kcal/kg
+                const coalEfficiency = parseFloat(document.getElementById('coal-efficiency').value); // %
+                const coalRate = parseFloat(document.getElementById('coal-rate').value); // PKR/kg
+                
+                // Validate inputs
+                const validationErrors = [];
+                
+                if (isNaN(steamGeneration) || steamGeneration <= 0) validationErrors.push("Steam Generation must be a positive number");
+                if (isNaN(steamPressure) || steamPressure <= 0) validationErrors.push("Steam Pressure must be a positive number");
+                if (isNaN(feedwaterTemp) || feedwaterTemp <= 0 || feedwaterTemp >= 200) validationErrors.push("Feed Water Temperature must be between 1°C and 200°C");
+                
+                if (isNaN(biomassGCV) || biomassGCV <= 0) validationErrors.push("Biomass GCV must be a positive number");
+                if (isNaN(biomassEfficiency) || biomassEfficiency <= 0 || biomassEfficiency > 100) validationErrors.push("Biomass Efficiency must be between 1% and 100%");
+                if (isNaN(biomassRate) || biomassRate < 0) validationErrors.push("Biomass Rate must be 0 or greater");
+                
+                if (isNaN(coalGCV) || coalGCV <= 0) validationErrors.push("Coal GCV must be a positive number");
+                if (isNaN(coalEfficiency) || coalEfficiency <= 0 || coalEfficiency > 100) validationErrors.push("Coal Efficiency must be between 1% and 100%");
+                if (isNaN(coalRate) || coalRate < 0) validationErrors.push("Coal Rate must be 0 or greater");
+                
+                if (validationErrors.length > 0) {
+                    if (errorMessageElement) {
+                        errorMessageElement.textContent = "Please fix the following errors:\n" + validationErrors.join("\n");
+                        errorMessageElement.style.display = 'block';
+                    }
+                    return;
+                }
+                
+                // Step 1: Calculate heat required per kg of steam
+                // Using ACCURATE steam table function
+                const hg = getSteamEnthalpy(steamPressure); // kcal/kg
+                
+                // Enthalpy of feed water at given temperature (kcal/kg)
+                // Specific heat of water is ~1 kcal/kg·°C, so approximate
+                const hf = feedwaterTemp; // kcal/kg
+                
+                const heatPerKgSteam = hg - hf; // kcal/kg
+                
+                // Step 2: Calculate total heat to steam per hour
+                const steamGenerationKgH = steamGeneration * 1000; // Convert tph to kg/h
+                const totalHeatPerHour = steamGenerationKgH * heatPerKgSteam; // kcal/h
+                
+                // Step 3: Calculate fuel consumption for each fuel
+                
+                // For biomass
+                const biomassFuelEnergyPerHour = totalHeatPerHour / (biomassEfficiency / 100);
+                const biomassConsumptionPerHour = biomassFuelEnergyPerHour / biomassGCV; // kg/h
+                const biomassPerKgSteam = biomassConsumptionPerHour / steamGenerationKgH; // kg fuel/kg steam
+                
+                // For coal
+                const coalFuelEnergyPerHour = totalHeatPerHour / (coalEfficiency / 100);
+                const coalConsumptionPerHour = coalFuelEnergyPerHour / coalGCV; // kg/h
+                const coalPerKgSteam = coalConsumptionPerHour / steamGenerationKgH; // kg fuel/kg steam
+                
+                // Step 4: Calculate fuel cost per kg of steam
+                const biomassCostPerKgSteam = biomassPerKgSteam * biomassRate; // PKR/kg steam
+                const coalCostPerKgSteam = coalPerKgSteam * coalRate; // PKR/kg steam
+                
+                // Display results
+                document.getElementById('biomass-gcv-result').textContent = biomassGCV.toLocaleString();
+                document.getElementById('coal-gcv-result').textContent = coalGCV.toLocaleString();
+                
+                document.getElementById('biomass-eff-result').textContent = biomassEfficiency;
+                document.getElementById('coal-eff-result').textContent = coalEfficiency;
+                
+                document.getElementById('heat-per-steam').textContent = heatPerKgSteam.toFixed(1);
+                
+                document.getElementById('biomass-per-kg').textContent = biomassPerKgSteam.toFixed(4);
+                document.getElementById('coal-per-kg').textContent = coalPerKgSteam.toFixed(4);
+                
+                document.getElementById('biomass-per-hour').textContent = Math.round(biomassConsumptionPerHour).toLocaleString();
+                document.getElementById('coal-per-hour').textContent = Math.round(coalConsumptionPerHour).toLocaleString();
+                
+                document.getElementById('biomass-rate-result').textContent = biomassRate.toFixed(2);
+                document.getElementById('coal-rate-result').textContent = coalRate.toFixed(2);
+                
+                document.getElementById('biomass-cost-per-steam').textContent = biomassCostPerKgSteam.toFixed(2);
+                document.getElementById('coal-cost-per-steam').textContent = coalCostPerKgSteam.toFixed(2);
+                
+                // Highlight the cheaper option
+                const biomassCostElement = document.getElementById('biomass-cost-per-steam');
+                const coalCostElement = document.getElementById('coal-cost-per-steam');
+                
+                biomassCostElement.classList.remove('highlight', 'warning');
+                coalCostElement.classList.remove('highlight', 'warning');
+                
+                if (biomassCostPerKgSteam < coalCostPerKgSteam) {
+                    biomassCostElement.classList.add('highlight');
+                    coalCostElement.classList.add('warning');
+                } else if (coalCostPerKgSteam < biomassCostPerKgSteam) {
+                    coalCostElement.classList.add('highlight');
+                    biomassCostElement.classList.add('warning');
+                } else {
+                    biomassCostElement.classList.add('highlight');
+                    coalCostElement.classList.add('highlight');
+                }
+                
+                // Generate recommendation
+                const recommendationText = document.getElementById('recommendation-text');
+                const massDifference = ((coalPerKgSteam - biomassPerKgSteam) / coalPerKgSteam * 100).toFixed(1);
+                
+                if (biomassCostPerKgSteam < coalCostPerKgSteam) {
+                    recommendationText.innerHTML = `
+                        <strong>Biomass (Corn Cob) is more cost-effective</strong> with a fuel cost of <span class="highlight">${biomassCostPerKgSteam.toFixed(2)} PKR/kg steam</span> compared to coal at ${coalCostPerKgSteam.toFixed(2)} PKR/kg steam.
+                        <br><br>
+                        However, note that coal consumes <strong>${Math.abs(massDifference)}% less mass</strong> per kg of steam due to its higher GCV and efficiency. 
+                        Consider biomass availability, handling costs, and boiler maintenance when making your final decision.
+                    `;
+                } else if (coalCostPerKgSteam < biomassCostPerKgSteam) {
+                    recommendationText.innerHTML = `
+                        <strong>Coal is more cost-effective</strong> with a fuel cost of <span class="highlight">${coalCostPerKgSteam.toFixed(2)} PKR/kg steam</span> compared to biomass at ${biomassCostPerKgSteam.toFixed(2)} PKR/kg steam.
+                        <br><br>
+                        Coal also consumes <strong>${massDifference}% less mass</strong> per kg of steam due to its higher GCV and efficiency. 
+                        However, consider environmental regulations and emissions when using coal.
+                    `;
+                } else {
+                    recommendationText.innerHTML = `
+                        Both fuels have the same fuel cost per kg of steam at <span class="highlight">${biomassCostPerKgSteam.toFixed(2)} PKR/kg steam</span>.
+                        <br><br>
+                        Consider other factors such as environmental impact, fuel availability, and handling requirements when choosing between biomass and coal.
+                    `;
+                }
+                
+                // Display calculation steps
+                document.getElementById('step1').textContent = `hg (steam enthalpy at ${steamPressure} bar) = ${hg.toFixed(1)} kcal/kg, hf (feed water at ${feedwaterTemp}°C) = ${hf.toFixed(1)} kcal/kg. Heat per kg steam = ${hg.toFixed(1)} - ${hf.toFixed(1)} = ${heatPerKgSteam.toFixed(1)} kcal/kg`;
+                document.getElementById('step2').textContent = `Steam generation = ${steamGeneration} tph = ${steamGenerationKgH.toLocaleString()} kg/h. Total heat per hour = ${steamGenerationKgH.toLocaleString()} × ${heatPerKgSteam.toFixed(1)} = ${totalHeatPerHour.toLocaleString(undefined, {maximumFractionDigits: 0})} kcal/h`;
+                document.getElementById('step3').textContent = `Biomass: Fuel energy/hour = ${totalHeatPerHour.toLocaleString(undefined, {maximumFractionDigits: 0})} ÷ (${biomassEfficiency}%) = ${biomassFuelEnergyPerHour.toLocaleString(undefined, {maximumFractionDigits: 0})} kcal/h. Fuel/hour = ${biomassFuelEnergyPerHour.toLocaleString(undefined, {maximumFractionDigits: 0})} ÷ ${biomassGCV.toLocaleString()} = ${biomassConsumptionPerHour.toLocaleString(undefined, {maximumFractionDigits: 0})} kg/h. Fuel/kg steam = ${biomassConsumptionPerHour.toLocaleString(undefined, {maximumFractionDigits: 0})} ÷ ${steamGenerationKgH.toLocaleString()} = ${biomassPerKgSteam.toFixed(4)} kg/kg steam`;
+                document.getElementById('step4').textContent = `Biomass cost/kg steam = ${biomassPerKgSteam.toFixed(4)} × ${biomassRate} = ${biomassCostPerKgSteam.toFixed(2)} PKR. Coal cost/kg steam = ${coalPerKgSteam.toFixed(4)} × ${coalRate} = ${coalCostPerKgSteam.toFixed(2)} PKR`;
+                
+                // Show results section
+                if (resultsSection) {
+                    resultsSection.style.display = 'block';
+                    
+                    // Scroll to results
+                    resultsSection.scrollIntoView({ behavior: 'smooth' });
+                }
+                
+            } catch (error) {
+                if (errorMessageElement) {
+                    errorMessageElement.textContent = "An error occurred during calculation: " + error.message;
+                    errorMessageElement.style.display = 'block';
+                }
+                console.error("Calculation error:", error);
+            }
+        }
+    </script>
+</body>
+</html>
